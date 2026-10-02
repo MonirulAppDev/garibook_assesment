@@ -1,0 +1,11 @@
+{
+  "flavor": "prod",
+  "appName": "NavTest",
+  "packageName": "com.garibook.navtest",
+  "osrmBaseUrl": "https://router.project-osrm.org",
+  "tileUrlTemplate": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "showDevBadge": false,
+  "enableNetworkLogs": false,
+  "connectTimeoutMs": 8000,
+  "receiveTimeoutMs": 12000
+}
