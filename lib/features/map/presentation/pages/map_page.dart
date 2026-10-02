@@ -10,6 +10,7 @@ import '../../../../shared/extensions/geo_point_x.dart';
 import '../../../../shared/theme/app_spacing.dart';
 import '../../../location/presentation/bloc/location_bloc.dart';
 import '../../../location/presentation/widgets/location_status_panel.dart';
+import '../../../navigation/domain/entities/live_position.dart';
 import '../../../navigation/presentation/cubit/navigation_cubit.dart';
 import '../../../navigation/presentation/widgets/navigation_panel.dart';
 import '../../../navigation/presentation/widgets/navigation_ticker.dart';
@@ -92,6 +93,17 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
         .add(RouteDeviceLocationChanged(state.fix?.position));
 
     final fix = state.fix;
+    if (fix != null) {
+      final moving = (fix.speedMps ?? 0) >= 1;
+      context.read<NavigationCubit>().onLivePosition(
+            LivePosition(
+              point: fix.position,
+              accuracyMeters: fix.accuracyMeters,
+              headingDegrees: moving ? fix.bearingDegrees : null,
+            ),
+          );
+    }
+
     final hasRoute = context.read<RoutingBloc>().state.route != null;
     if (fix != null && !_centeredOnUser && !hasRoute && _mapReady) {
       _centeredOnUser = true;
@@ -100,24 +112,44 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
   }
 
   void _onRouteChanged(BuildContext context, RoutingState state) {
-    context.read<NavigationCubit>().loadRoute(state.route);
+    final navigation = context.read<NavigationCubit>();
+    // A live re-route must not yank the camera away from the car.
+    final keepCamera = navigation.state.isLive && navigation.state.isActive;
+    navigation.loadRoute(state.route);
     final route = state.route;
-    if (route != null) _fitRoute(route);
+    if (route != null && !keepCamera) _fitRoute(route);
   }
 
+  void _onRerouteRequested(BuildContext context, NavigationState state) {
+    final from = state.rerouteFrom;
+    if (from != null) {
+      context.read<RoutingBloc>().add(RouteRerouteRequested(from));
+    }
+  }
+
+  /// Navigation camera: while following, keep the car centred with its
+  /// heading pointing up; return to north-up when navigation ends.
   void _onNavigationChanged(BuildContext context, NavigationState state) {
+    if (!_mapReady) return;
     final frame = state.frame;
-    if (!_mapReady || frame == null || !state.following || !state.isActive) {
+    if (!state.isActive || frame == null) {
+      if (_mapController.camera.rotation != 0) _mapController.rotate(0);
       return;
     }
+    if (!state.following) return;
     final zoom = math.max(_mapController.camera.zoom, _followZoom);
-    _mapController.move(frame.position.toLatLng(), zoom);
+    _mapController.moveAndRotate(
+      frame.position.toLatLng(),
+      zoom,
+      -frame.bearingDegrees,
+    );
   }
 
   // endregion
 
   void _fitRoute(NavRoute route) {
     if (!_mapReady || route.points.length < 2) return;
+    _mapController.rotate(0);
     _mapController.fitCamera(
       CameraFit.coordinates(
         coordinates: [for (final p in route.points) p.toLatLng()],
@@ -157,9 +189,14 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
         BlocListener<NavigationCubit, NavigationState>(
           listenWhen: (a, b) =>
               a.frame?.position != b.frame?.position ||
+              a.frame?.bearingDegrees != b.frame?.bearingDegrees ||
               a.following != b.following ||
               a.isActive != b.isActive,
           listener: _onNavigationChanged,
+        ),
+        BlocListener<NavigationCubit, NavigationState>(
+          listenWhen: (a, b) => a.rerouteRequests != b.rerouteRequests,
+          listener: _onRerouteRequested,
         ),
       ],
       child: NavigationTicker(
@@ -241,6 +278,9 @@ class _BottomControls extends StatelessWidget {
       (NavigationCubit c) => c.state.isActive && !c.state.following,
     );
     final showStartHint = context.select((LocationBloc b) => !b.state.isBusy);
+    final liveAvailable = context.select(
+      (LocationBloc b) => b.state.status == LocationStatus.ready,
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -267,7 +307,10 @@ class _BottomControls extends StatelessWidget {
         AppSpacing.gapMd,
         RoutePanel(showStartHint: showStartHint),
         AppSpacing.gapSm,
-        NavigationPanel(onClose: onClearRoute),
+        NavigationPanel(
+          onClose: onClearRoute,
+          liveAvailable: liveAvailable,
+        ),
       ],
     );
   }

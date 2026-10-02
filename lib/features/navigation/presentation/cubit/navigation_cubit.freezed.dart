@@ -16,8 +16,10 @@ T _$identity<T>(T value) => value;
 mixin _$NavigationState {
 
 /// Null when there is no route loaded.
- NavigationFrame? get frame;/// Camera follows the car until the user pans the map.
- bool get following; SpeedMultiplier get speed;
+ NavigationFrame? get frame; DriveMode get mode;/// Camera follows the car until the user moves the map.
+ bool get following; SpeedMultiplier get speed;/// Incremented each time live mode detects the device left the route;
+/// [rerouteFrom] is where to route from.
+ int get rerouteRequests; GeoPoint? get rerouteFrom;
 /// Create a copy of NavigationState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,20 +31,20 @@ $NavigationStateCopyWith<NavigationState> get copyWith => _$NavigationStateCopyW
 @override
 bool operator ==(Object other) {
   final _this = this as NavigationState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is NavigationState&&(identical(other.frame, _this.frame) || other.frame == _this.frame)&&(identical(other.following, _this.following) || other.following == _this.following)&&(identical(other.speed, _this.speed) || other.speed == _this.speed));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is NavigationState&&(identical(other.frame, _this.frame) || other.frame == _this.frame)&&(identical(other.mode, _this.mode) || other.mode == _this.mode)&&(identical(other.following, _this.following) || other.following == _this.following)&&(identical(other.speed, _this.speed) || other.speed == _this.speed)&&(identical(other.rerouteRequests, _this.rerouteRequests) || other.rerouteRequests == _this.rerouteRequests)&&(identical(other.rerouteFrom, _this.rerouteFrom) || other.rerouteFrom == _this.rerouteFrom));
 }
 
 
 @override
 int get hashCode {
   final _this = this as NavigationState;
-  return Object.hash(runtimeType,_this.frame,_this.following,_this.speed);
+  return Object.hash(runtimeType,_this.frame,_this.mode,_this.following,_this.speed,_this.rerouteRequests,_this.rerouteFrom);
 }
 
 @override
 String toString() {
   final _this = this as NavigationState;
-  return 'NavigationState(frame: ${_this.frame}, following: ${_this.following}, speed: ${_this.speed})';
+  return 'NavigationState(frame: ${_this.frame}, mode: ${_this.mode}, following: ${_this.following}, speed: ${_this.speed}, rerouteRequests: ${_this.rerouteRequests}, rerouteFrom: ${_this.rerouteFrom})';
 }
 
 
@@ -53,11 +55,11 @@ abstract mixin class $NavigationStateCopyWith<$Res>  {
   factory $NavigationStateCopyWith(NavigationState value, $Res Function(NavigationState) _then) = _$NavigationStateCopyWithImpl;
 @useResult
 $Res call({
- NavigationFrame? frame, bool following, SpeedMultiplier speed
+ NavigationFrame? frame, DriveMode mode, bool following, SpeedMultiplier speed, int rerouteRequests, GeoPoint? rerouteFrom
 });
 
 
-$NavigationFrameCopyWith<$Res>? get frame;
+$NavigationFrameCopyWith<$Res>? get frame;$GeoPointCopyWith<$Res>? get rerouteFrom;
 
 }
 /// @nodoc
@@ -70,12 +72,15 @@ class _$NavigationStateCopyWithImpl<$Res>
 
 /// Create a copy of NavigationState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? frame = freezed,Object? following = null,Object? speed = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? frame = freezed,Object? mode = null,Object? following = null,Object? speed = null,Object? rerouteRequests = null,Object? rerouteFrom = freezed,}) {
   return _then(NavigationState(
 frame: freezed == frame ? _self.frame : frame // ignore: cast_nullable_to_non_nullable
-as NavigationFrame?,following: null == following ? _self.following : following // ignore: cast_nullable_to_non_nullable
+as NavigationFrame?,mode: null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
+as DriveMode,following: null == following ? _self.following : following // ignore: cast_nullable_to_non_nullable
 as bool,speed: null == speed ? _self.speed : speed // ignore: cast_nullable_to_non_nullable
-as SpeedMultiplier,
+as SpeedMultiplier,rerouteRequests: null == rerouteRequests ? _self.rerouteRequests : rerouteRequests // ignore: cast_nullable_to_non_nullable
+as int,rerouteFrom: freezed == rerouteFrom ? _self.rerouteFrom : rerouteFrom // ignore: cast_nullable_to_non_nullable
+as GeoPoint?,
   ));
 }
 /// Create a copy of NavigationState
@@ -89,6 +94,18 @@ $NavigationFrameCopyWith<$Res>? get frame {
 
   return $NavigationFrameCopyWith<$Res>(_self.frame!, (value) {
     return _then(_self.copyWith(frame: value));
+  });
+}/// Create a copy of NavigationState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$GeoPointCopyWith<$Res>? get rerouteFrom {
+    if (_self.rerouteFrom == null) {
+    return null;
+  }
+
+  return $GeoPointCopyWith<$Res>(_self.rerouteFrom!, (value) {
+    return _then(_self.copyWith(rerouteFrom: value));
   });
 }
 }
@@ -172,10 +189,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( NavigationFrame? frame,  bool following,  SpeedMultiplier speed)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( NavigationFrame? frame,  DriveMode mode,  bool following,  SpeedMultiplier speed,  int rerouteRequests,  GeoPoint? rerouteFrom)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _NavigationState() when $default != null:
-return $default(_that.frame,_that.following,_that.speed);case _:
+return $default(_that.frame,_that.mode,_that.following,_that.speed,_that.rerouteRequests,_that.rerouteFrom);case _:
   return orElse();
 
 }
@@ -193,10 +210,10 @@ return $default(_that.frame,_that.following,_that.speed);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( NavigationFrame? frame,  bool following,  SpeedMultiplier speed)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( NavigationFrame? frame,  DriveMode mode,  bool following,  SpeedMultiplier speed,  int rerouteRequests,  GeoPoint? rerouteFrom)  $default,) {final _that = this;
 switch (_that) {
 case _NavigationState():
-return $default(_that.frame,_that.following,_that.speed);case _:
+return $default(_that.frame,_that.mode,_that.following,_that.speed,_that.rerouteRequests,_that.rerouteFrom);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -213,10 +230,10 @@ return $default(_that.frame,_that.following,_that.speed);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( NavigationFrame? frame,  bool following,  SpeedMultiplier speed)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( NavigationFrame? frame,  DriveMode mode,  bool following,  SpeedMultiplier speed,  int rerouteRequests,  GeoPoint? rerouteFrom)?  $default,) {final _that = this;
 switch (_that) {
 case _NavigationState() when $default != null:
-return $default(_that.frame,_that.following,_that.speed);case _:
+return $default(_that.frame,_that.mode,_that.following,_that.speed,_that.rerouteRequests,_that.rerouteFrom);case _:
   return null;
 
 }
@@ -228,14 +245,19 @@ return $default(_that.frame,_that.following,_that.speed);case _:
 
 
 class _NavigationState extends NavigationState {
-  const _NavigationState({this.frame, this.following = true, this.speed = SpeedMultiplier.x1}): super._();
+  const _NavigationState({this.frame, this.mode = DriveMode.simulation, this.following = true, this.speed = SpeedMultiplier.x1, this.rerouteRequests = 0, this.rerouteFrom}): super._();
   
 
 /// Null when there is no route loaded.
 @override final  NavigationFrame? frame;
-/// Camera follows the car until the user pans the map.
+@override@JsonKey() final  DriveMode mode;
+/// Camera follows the car until the user moves the map.
 @override@JsonKey() final  bool following;
 @override@JsonKey() final  SpeedMultiplier speed;
+/// Incremented each time live mode detects the device left the route;
+/// [rerouteFrom] is where to route from.
+@override@JsonKey() final  int rerouteRequests;
+@override final  GeoPoint? rerouteFrom;
 
 /// Create a copy of NavigationState
 /// with the given fields replaced by the non-null parameter values.
@@ -247,18 +269,18 @@ _$NavigationStateCopyWith<_NavigationState> get copyWith => __$NavigationStateCo
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _NavigationState&&(identical(other.frame, frame) || other.frame == frame)&&(identical(other.following, following) || other.following == following)&&(identical(other.speed, speed) || other.speed == speed));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _NavigationState&&(identical(other.frame, frame) || other.frame == frame)&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.following, following) || other.following == following)&&(identical(other.speed, speed) || other.speed == speed)&&(identical(other.rerouteRequests, rerouteRequests) || other.rerouteRequests == rerouteRequests)&&(identical(other.rerouteFrom, rerouteFrom) || other.rerouteFrom == rerouteFrom));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,frame,following,speed);
+    return Object.hash(runtimeType,frame,mode,following,speed,rerouteRequests,rerouteFrom);
 }
 
 @override
 String toString() {
-    return 'NavigationState(frame: $frame, following: $following, speed: $speed)';
+    return 'NavigationState(frame: $frame, mode: $mode, following: $following, speed: $speed, rerouteRequests: $rerouteRequests, rerouteFrom: $rerouteFrom)';
 }
 
 
@@ -269,11 +291,11 @@ abstract mixin class _$NavigationStateCopyWith<$Res> implements $NavigationState
   factory _$NavigationStateCopyWith(_NavigationState value, $Res Function(_NavigationState) _then) = __$NavigationStateCopyWithImpl;
 @override @useResult
 $Res call({
- NavigationFrame? frame, bool following, SpeedMultiplier speed
+ NavigationFrame? frame, DriveMode mode, bool following, SpeedMultiplier speed, int rerouteRequests, GeoPoint? rerouteFrom
 });
 
 
-@override $NavigationFrameCopyWith<$Res>? get frame;
+@override $NavigationFrameCopyWith<$Res>? get frame;@override $GeoPointCopyWith<$Res>? get rerouteFrom;
 
 }
 /// @nodoc
@@ -286,12 +308,15 @@ class __$NavigationStateCopyWithImpl<$Res>
 
 /// Create a copy of NavigationState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? frame = freezed,Object? following = null,Object? speed = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? frame = freezed,Object? mode = null,Object? following = null,Object? speed = null,Object? rerouteRequests = null,Object? rerouteFrom = freezed,}) {
   return _then(_NavigationState(
 frame: freezed == frame ? _self.frame : frame // ignore: cast_nullable_to_non_nullable
-as NavigationFrame?,following: null == following ? _self.following : following // ignore: cast_nullable_to_non_nullable
+as NavigationFrame?,mode: null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
+as DriveMode,following: null == following ? _self.following : following // ignore: cast_nullable_to_non_nullable
 as bool,speed: null == speed ? _self.speed : speed // ignore: cast_nullable_to_non_nullable
-as SpeedMultiplier,
+as SpeedMultiplier,rerouteRequests: null == rerouteRequests ? _self.rerouteRequests : rerouteRequests // ignore: cast_nullable_to_non_nullable
+as int,rerouteFrom: freezed == rerouteFrom ? _self.rerouteFrom : rerouteFrom // ignore: cast_nullable_to_non_nullable
+as GeoPoint?,
   ));
 }
 
@@ -306,6 +331,18 @@ $NavigationFrameCopyWith<$Res>? get frame {
 
   return $NavigationFrameCopyWith<$Res>(_self.frame!, (value) {
     return _then(_self.copyWith(frame: value));
+  });
+}/// Create a copy of NavigationState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$GeoPointCopyWith<$Res>? get rerouteFrom {
+    if (_self.rerouteFrom == null) {
+    return null;
+  }
+
+  return $GeoPointCopyWith<$Res>(_self.rerouteFrom!, (value) {
+    return _then(_self.copyWith(rerouteFrom: value));
   });
 }
 }

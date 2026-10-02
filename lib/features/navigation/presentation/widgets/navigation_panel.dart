@@ -9,10 +9,17 @@ import '../cubit/navigation_cubit.dart';
 
 /// Live remaining distance/time, progress and playback controls.
 class NavigationPanel extends StatelessWidget {
-  const NavigationPanel({required this.onClose, super.key});
+  const NavigationPanel({
+    required this.onClose,
+    this.liveAvailable = false,
+    super.key,
+  });
 
   /// Removes the route entirely (owned by the routing feature).
   final VoidCallback onClose;
+
+  /// Live GPS mode needs a working device location.
+  final bool liveAvailable;
 
   @override
   Widget build(BuildContext context) {
@@ -96,19 +103,49 @@ class NavigationPanel extends StatelessWidget {
                       icon: const Icon(Icons.replay),
                     ),
                     const Spacer(),
-                    SegmentedButton<SpeedMultiplier>(
-                      showSelectedIcon: false,
-                      style: const ButtonStyle(
-                        visualDensity: VisualDensity.compact,
+                    if (state.isLive)
+                      Text(
+                        'Following GPS',
+                        style: context.textTheme.labelLarge?.copyWith(
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                      )
+                    else
+                      SegmentedButton<SpeedMultiplier>(
+                        showSelectedIcon: false,
+                        style: const ButtonStyle(
+                          visualDensity: VisualDensity.compact,
+                        ),
+                        segments: [
+                          for (final s in SpeedMultiplier.values)
+                            ButtonSegment(value: s, label: Text(s.label)),
+                        ],
+                        selected: {state.speed},
+                        onSelectionChanged: (s) => cubit.setSpeed(s.first),
                       ),
-                      segments: [
-                        for (final s in SpeedMultiplier.values)
-                          ButtonSegment(value: s, label: Text(s.label)),
-                      ],
-                      selected: {state.speed},
-                      onSelectionChanged: (s) => cubit.setSpeed(s.first),
+                  ],
+                ),
+                AppSpacing.gapSm,
+                SegmentedButton<DriveMode>(
+                  showSelectedIcon: false,
+                  style: const ButtonStyle(
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  segments: [
+                    const ButtonSegment(
+                      value: DriveMode.simulation,
+                      icon: Icon(Icons.smart_display_outlined, size: 18),
+                      label: Text('Simulate'),
+                    ),
+                    ButtonSegment(
+                      value: DriveMode.live,
+                      enabled: liveAvailable,
+                      icon: const Icon(Icons.gps_fixed, size: 18),
+                      label: const Text('Live GPS'),
                     ),
                   ],
+                  selected: {state.mode},
+                  onSelectionChanged: (m) => cubit.setMode(m.first),
                 ),
               ],
             ),

@@ -22,6 +22,13 @@ final class RouteUseDeviceLocationRequested extends RoutingEvent {
   const RouteUseDeviceLocationRequested();
 }
 
+/// Live navigation left the route: re-plan from [from] (the device
+/// position) to the current destination.
+final class RouteRerouteRequested extends RoutingEvent {
+  const RouteRerouteRequested(this.from);
+  final GeoPoint from;
+}
+
 final class RouteRetryRequested extends RoutingEvent {
   const RouteRetryRequested();
 }

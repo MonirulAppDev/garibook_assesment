@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garibook_assesment/core/geo/geo_point.dart';
+import 'package:garibook_assesment/features/navigation/domain/entities/live_position.dart';
 import 'package:garibook_assesment/features/navigation/domain/entities/navigation_status.dart';
 import 'package:garibook_assesment/features/navigation/presentation/cubit/navigation_cubit.dart';
 import 'package:garibook_assesment/features/routing/domain/entities/nav_route.dart';
@@ -77,6 +78,65 @@ void main() {
   test('clearing the route removes the car', () {
     cubit.loadRoute(null);
     expect(cubit.state.hasRoute, isFalse);
+  });
+
+  group('live GPS mode', () {
+    const metre = 0.000009;
+    LivePosition at(double lat, double lng) => LivePosition(
+          point: GeoPoint(latitude: lat, longitude: lng),
+          accuracyMeters: 5,
+        );
+
+    test('car follows device fixes, seeded from the last known position',
+        () {
+      cubit
+        ..onLivePosition(at(0, 0.004))
+        ..setMode(DriveMode.live)
+        ..start();
+      expect(cubit.state.isLive, isTrue);
+      expect(cubit.state.frame!.position.longitude, closeTo(0.004, 1e-9));
+    });
+
+    test('off-route requests a re-route, respecting the cooldown', () async {
+      var now = DateTime(2026);
+      await cubit.close();
+      cubit = NavigationCubit(now: () => now)
+        ..loadRoute(route)
+        ..setMode(DriveMode.live)
+        ..start();
+
+      for (var i = 0; i < 2; i++) {
+        cubit.onLivePosition(at(80 * metre, 0.003));
+      }
+      expect(cubit.state.rerouteRequests, 1);
+      expect(cubit.state.rerouteFrom!.latitude, closeTo(80 * metre, 1e-12));
+
+      for (var i = 0; i < 2; i++) {
+        cubit.onLivePosition(at(80 * metre, 0.003));
+      }
+      expect(cubit.state.rerouteRequests, 1, reason: 'cooldown');
+
+      now = now.add(const Duration(seconds: 16));
+      for (var i = 0; i < 2; i++) {
+        cubit.onLivePosition(at(80 * metre, 0.003));
+      }
+      expect(cubit.state.rerouteRequests, 2);
+    });
+
+    test('a new route keeps an active live session tracking', () {
+      cubit
+        ..setMode(DriveMode.live)
+        ..start()
+        ..loadRoute(route);
+      expect(cubit.state.status, NavigationStatus.playing);
+    });
+
+    test('simulation ignores device fixes', () {
+      cubit
+        ..start()
+        ..onLivePosition(at(0, 0.008));
+      expect(cubit.state.frame!.position.longitude, closeTo(0, 1e-9));
+    });
   });
 
   test('tick after close is ignored (no emit after dispose)', () async {

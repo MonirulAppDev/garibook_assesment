@@ -171,6 +171,23 @@ void main() {
     expect(repo.calls, hasLength(2));
   });
 
+  test('re-route plans from the device position to the same destination',
+      () async {
+    bloc
+      ..add(RouteMapLongPressed(d1)) // manual start
+      ..add(RouteMapLongPressed(d2)); // destination
+    await wait(30);
+    repo.pending[0].complete(Ok(routeTo(d1, d2)));
+    await wait(5);
+
+    bloc.add(RouteRerouteRequested(d3));
+    await wait(30);
+
+    expect(repo.calls.last, (from: d3, to: d2));
+    expect(bloc.state.manualOrigin, isNull);
+    expect(bloc.state.deviceLocation, d3);
+  });
+
   test('clear invalidates the in-flight request', () async {
     bloc
       ..add(RouteDeviceLocationChanged(home))

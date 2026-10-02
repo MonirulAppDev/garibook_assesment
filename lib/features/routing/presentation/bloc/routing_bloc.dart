@@ -37,6 +37,7 @@ class RoutingBloc extends Bloc<RoutingEvent, RoutingState> {
     on<RouteMapLongPressed>(_onLongPressed);
     on<RouteDeviceLocationChanged>(_onDeviceLocationChanged);
     on<RouteUseDeviceLocationRequested>(_onUseDeviceLocation);
+    on<RouteRerouteRequested>(_onReroute);
     on<RouteRetryRequested>(_onRetry);
     on<RouteCleared>(_onCleared);
     on<_RouteFetchRequested>(_onFetch, transformer: restartable());
@@ -86,6 +87,13 @@ class RoutingBloc extends Bloc<RoutingEvent, RoutingState> {
     if (state.deviceLocation == null) return;
     emit(state.copyWith(manualOrigin: null));
     if (state.destination != null) _requestFetch(emit);
+  }
+
+  void _onReroute(RouteRerouteRequested event, Emitter<RoutingState> emit) {
+    if (!event.from.isValid || state.destination == null) return;
+    // Same debounce/rate-limit/stale guards as any other fetch.
+    emit(state.copyWith(manualOrigin: null, deviceLocation: event.from));
+    _requestFetch(emit);
   }
 
   void _onRetry(RouteRetryRequested event, Emitter<RoutingState> emit) {
