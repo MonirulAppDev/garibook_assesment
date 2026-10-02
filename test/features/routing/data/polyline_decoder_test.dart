@@ -1,0 +1,26 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:garibook_assesment/features/routing/data/mappers/polyline_decoder.dart';
+
+void main() {
+  const decoder = PolylineDecoder();
+
+  test('decodes the reference polyline from the algorithm spec', () {
+    final points = decoder.decode('_p~iF~ps|U_ulLnnqC_mqNvxq`@');
+
+    expect(points, hasLength(3));
+    expect(points[0].latitude, closeTo(38.5, 1e-9));
+    expect(points[0].longitude, closeTo(-120.2, 1e-9));
+    expect(points[1].latitude, closeTo(40.7, 1e-9));
+    expect(points[1].longitude, closeTo(-120.95, 1e-9));
+    expect(points[2].latitude, closeTo(43.252, 1e-9));
+    expect(points[2].longitude, closeTo(-126.453, 1e-9));
+  });
+
+  test('empty input yields no points', () {
+    expect(decoder.decode(''), isEmpty);
+  });
+
+  test('truncated input does not throw', () {
+    expect(() => decoder.decode('_p~iF~ps|U_ulL'), returnsNormally);
+  });
+}
