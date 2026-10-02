@@ -1,8 +1,18 @@
+import 'dart:math' as math;
+
 import '../../../../core/geo/geo_math.dart';
 import '../../../../core/geo/geo_point.dart';
 
 /// A position on the route: where, and which way the road is heading.
 typedef RoutePosition = ({GeoPoint point, double bearing});
+
+/// Result of snapping an arbitrary point onto the route.
+typedef RouteProjection = ({
+  GeoPoint point,
+  double distanceAlong,
+  double offsetMeters,
+  double bearing,
+});
 
 /// Cleaned route polyline with precomputed cumulative distances, so any
 /// position can be looked up by *distance travelled* in O(log n).
@@ -76,6 +86,51 @@ final class RouteGeometry {
       bearing: _bearings[i],
     );
   }
+
+  /// Nearest point on the route to [p] (snap-to-route).
+  ///
+  /// Each segment is projected in a local equirectangular plane centred on
+  /// its start, which is accurate to centimetres at segment scale.
+  /// Returns null for an empty route.
+  RouteProjection? project(GeoPoint p) {
+    if (points.isEmpty || !p.isValid) return null;
+    if (isDegenerate) {
+      return (
+        point: points.first,
+        distanceAlong: 0,
+        offsetMeters: GeoMath.distance(points.first, p),
+        bearing: 0,
+      );
+    }
+
+    RouteProjection? best;
+    for (var i = 0; i < points.length - 1; i++) {
+      final a = points[i];
+      final b = points[i + 1];
+      final cosLat = math.cos(a.latitude * math.pi / 180);
+      // Planar metres relative to a.
+      final bx = (b.longitude - a.longitude) * cosLat * _metersPerDegree;
+      final by = (b.latitude - a.latitude) * _metersPerDegree;
+      final px = (p.longitude - a.longitude) * cosLat * _metersPerDegree;
+      final py = (p.latitude - a.latitude) * _metersPerDegree;
+      final len2 = bx * bx + by * by;
+      final t = len2 > 0 ? ((px * bx + py * by) / len2).clamp(0.0, 1.0) : 0.0;
+      final dx = px - bx * t;
+      final dy = py - by * t;
+      final offset = math.sqrt(dx * dx + dy * dy);
+      if (best == null || offset < best.offsetMeters) {
+        best = (
+          point: GeoMath.lerp(a, b, t),
+          distanceAlong: _cumulative[i] + (_cumulative[i + 1] - _cumulative[i]) * t,
+          offsetMeters: offset,
+          bearing: _bearings[i],
+        );
+      }
+    }
+    return best;
+  }
+
+  static const _metersPerDegree = GeoMath.earthRadiusMeters * math.pi / 180;
 
   /// Largest segment index `i` with `cumulative[i] <= d`.
   int _segmentIndexAt(double d) {

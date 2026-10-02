@@ -1,13 +1,14 @@
 import '../entities/navigation_frame.dart';
 import '../entities/navigation_status.dart';
 import 'bearing_smoother.dart';
+import 'navigation_engine.dart';
 import 'route_geometry.dart';
 
 /// Pure-Dart car simulation along a [RouteGeometry].
 ///
 /// Driven externally by [tick] (a Flutter Ticker in the app, plain calls in
 /// tests), so it is fully testable without a map widget or real time.
-final class RouteAnimator {
+final class RouteAnimator implements NavigationEngine {
   RouteAnimator({
     required this.geometry,
     required this.etaSpeedMps,
@@ -39,6 +40,7 @@ final class RouteAnimator {
   SpeedMultiplier _speed;
   double _travelled = 0;
 
+  @override
   NavigationStatus get status => _status;
   SpeedMultiplier get speed => _speed;
   double get travelled => _travelled;
@@ -47,6 +49,7 @@ final class RouteAnimator {
 
   // region controls (invalid transitions are no-ops)
 
+  @override
   void start() {
     if (geometry.isDegenerate) {
       _travelled = geometry.totalLength;
@@ -64,24 +67,29 @@ final class RouteAnimator {
     }
   }
 
+  @override
   void pause() {
     if (_status == NavigationStatus.playing) _status = NavigationStatus.paused;
   }
 
+  @override
   void resume() {
     if (_status == NavigationStatus.paused) _status = NavigationStatus.playing;
   }
 
+  @override
   void reset() {
     _rewind();
     _status = NavigationStatus.idle;
   }
 
+  @override
   void setSpeed(SpeedMultiplier speed) => _speed = speed;
 
   // endregion
 
   /// Advances the simulation by [elapsed]. Returns true if the frame changed.
+  @override
   bool tick(Duration elapsed) {
     if (_status != NavigationStatus.playing) return false;
     final clamped = elapsed > maxStep ? maxStep : elapsed;
@@ -99,6 +107,7 @@ final class RouteAnimator {
     return true;
   }
 
+  @override
   NavigationFrame get frame {
     final position = geometry.positionAt(_travelled);
     final remainingMeters = remaining;
