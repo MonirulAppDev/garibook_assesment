@@ -81,6 +81,20 @@
 
 ## 7. Deliberately left out (time)
 
-- **Bonus features:** iOS (Swift/CoreLocation and schemes), live GPS mode, snap-to-route, off-route re-routing, and a rotating/tilting navigation camera.
-- **Tests:** widget and golden tests for the panels. Logic is covered by 72 unit and bloc tests.
+- **Bonus features:** iOS (Swift/CoreLocation and schemes) and camera tilt (`flutter_map` is 2D). Live GPS, snap-to-route, off-route re-routing and the rotating camera are implemented (section 8).
+- **Tests:** widget and golden tests for the panels. Logic is covered by 89 unit and bloc tests.
 - **`bloc_test`:** it can't be installed alongside `freezed 4.x` (they need different `analyzer` versions), so blocs are tested with plain stream and state assertions.
+
+## 8. Bonus: live GPS, snap-to-route, off-route, navigation camera
+
+- **One engine interface:** `RouteAnimator` (simulation) and `LiveRouteTracker` (GPS) both implement `NavigationEngine`. The cubit only swaps which engine is active (`DriveMode`), and the controls, ticker and UI stay unchanged.
+- **Live GPS:** fixes from the native stream flow LocationBloc → MapPage → `NavigationCubit.onLivePosition`, as a navigation-owned `LivePosition` type, so the navigation feature never imports the location feature. Fixes arrive every 1–2 s. Between fixes the car **glides** over 1 s; when both fixes are on the route, it glides *by distance along the road*, so it follows curves instead of cutting corners.
+- **Snap to route:** `RouteGeometry.project()` projects the fix onto every segment in a local equirectangular plane and picks the nearest. A fix within 50 m is drawn at the projected point, with the road's bearing. Farther fixes are drawn raw, using the device course (when moving) or the movement direction.
+- **Off-route:**
+  - **Trigger:** more than 50 m from the line on **2 consecutive** fixes. Fixes with accuracy worse than 40 m are ignored, so GPS jitter can't trigger it. After triggering, the detector needs 2 fresh confirmations.
+  - **Cooldown:** the cubit applies a 15 s cooldown, then emits a re-route request.
+  - **Re-route:** MapPage turns the request into `RouteRerouteRequested(from)`. That goes through the same debounce, rate-limit and stale guards as every other route request. The new route keeps the live session running and does not refit the camera.
+- **Navigation camera:**
+  - While following, `moveAndRotate(car, zoom, -bearing)` keeps the car centred with its heading up, using the smoothed bearing so the map doesn't jitter.
+  - The camera returns to north-up when navigation stops or a new route is fitted. User rotation gestures stay disabled.
+  - There is no tilt, because `flutter_map` is 2D.

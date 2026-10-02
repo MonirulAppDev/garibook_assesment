@@ -60,7 +60,7 @@ To point a flavor at another OSRM server, change `osrmBaseUrl` in its config fil
 
 ```bash
 flutter analyze
-flutter test        # 72 tests: engine, blocs, channel mapping, OSRM data source
+flutter test        # 89 tests: engine, live tracker, blocs, channel mapping, OSRM data source
 ```
 
 ## How to use
@@ -72,7 +72,9 @@ flutter test        # 72 tests: engine, blocs, channel mapping, OSRM data source
    - Panning the map stops following and shows a **Recenter** button.
    - Use **Pause/Resume**, **Reset** and **1x / 2x / 5x** to control playback.
    - Remaining time and distance update live.
-5. **Without location** (denied, services off, no fix, unsupported platform), the first long-press sets a **start point** and the second sets the destination. Once GPS becomes available, a **Route from my location** chip appears.
+   - While following, the map rotates so the car always points up.
+5. **Live GPS** (needs a location fix): switch the panel from **Simulate** to **Live GPS** and press Start. The car follows your real position, snapped to the road when within 50 m. If you stay more than 50 m off the route, a new route is fetched automatically (at most once every 15 s).
+6. **Without location** (denied, services off, no fix, unsupported platform), the first long-press sets a **start point** and the second sets the destination. Once GPS becomes available, a **Route from my location** chip appears.
 
 ## Packages
 
@@ -107,7 +109,7 @@ android/app/src/main/kotlin/com/garibook/navtest/location/   native location lay
 ## Assumptions
 
 - **Demo speed:** the simulated car is faster than real driving. At 1x it covers a route in about 60 s, clamped to between 15 and 250 m/s, and its speed is constant along the route. **Remaining time** uses OSRM's own average speed (`distance / duration`), so it shows a realistic driving ETA.
-- **Re-routing:** the route is planned from the location at the moment you long-press. It does not re-route when the device moves (that is the off-route bonus, not implemented).
+- **Re-routing:** in **Simulate** mode the route is planned once, from the location at the moment you long-press. In **Live GPS** mode it re-routes automatically when you leave the route.
 - **Foreground only:** location is only used while the app is in the foreground. The stream stops when the app goes to the background or the screen closes.
 - **Placeholder IDs:** `com.garibook.navtest` and the names "NavTest" / "NavTest Dev" are placeholders.
 - **Approximate permission:** granting only *approximate* location (Android 12+) is treated as usable, and reported to Dart as `grantedApproximate`.
@@ -118,6 +120,7 @@ android/app/src/main/kotlin/com/garibook/navtest/location/   native location lay
 - **iOS location is not implemented.** The Dart contract is ready for it: a Swift plugin registering the same channel names and codes would work without Dart changes. On iOS today, location reports `LocationNotSupported` and you set the start point manually.
 - **Play services:** a Google Play services device is required for native location. Without it, Dart gets a typed `PLAY_SERVICES_UNAVAILABLE` error.
 - **Public servers:** the public OSRM demo server is rate-limited and has no uptime guarantee. The app debounces long-presses, keeps at least 1 s between requests, and reports 429 and timeouts clearly, but it cannot fix an outage.
-- **Map orientation:** the map does not rotate or tilt with the car (the navigation-camera bonus). `flutter_map` has no tilt support.
-- **Not implemented (bonus):** live GPS mode, snap-to-route, off-route detection and iOS flavors.
+- **No tilt:** the navigation camera rotates with the car but does not tilt, because `flutter_map` is a 2D map with no tilt support.
+- **Not implemented (bonus):** iOS (Swift location layer and iOS flavors).
+- **Snap search:** snap-to-route checks every route segment for each fix, with no "progress window". On routes that loop back close to themselves, a fix could snap to the wrong pass.
 - **Release signing:** release builds are signed with the debug key.

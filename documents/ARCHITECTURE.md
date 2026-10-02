@@ -44,14 +44,14 @@ lib/
    ├─ location/               # native location via platform channels
    │  ├─ domain/  entities · failures (sealed) · repositories (abstract) · usecases
    │  ├─ data/    datasources (channel contract + MethodChannel impl) · models · repositories (impl)
-   │  └─ presentation/  bloc · widgets           (next step)
+   │  └─ presentation/  LocationBloc · status panel
    ├─ routing/                # OSRM route fetching
    │  ├─ domain/  NavRoute · RoutingFailure (sealed) · RoutingRepository · GetDrivingRoute
    │  ├─ data/    OsrmApi (retrofit) · OsrmRemoteDataSource · PolylineDecoder · DTOs · repo impl
-   │  └─ presentation/  bloc                     (next step)
+   │  └─ presentation/  RoutingBloc · route panel
    ├─ navigation/             # car animation engine (pure Dart)
-   │  ├─ domain/  NavigationFrame · NavigationStatus · SpeedMultiplier · (RouteGeometry, RouteAnimator next)
-   │  └─ presentation/  bloc + ticker bridge     (next step)
+   │  ├─ domain/  NavigationEngine · RouteGeometry (+ project) · RouteAnimator · LiveRouteTracker · BearingSmoother
+   │  └─ presentation/  NavigationCubit (DriveMode) · NavigationTicker · car marker · panel
    └─ map/                    # the single screen that composes the features
       └─ presentation/  pages/map_page.dart · widgets/
 ```
