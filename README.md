@@ -7,7 +7,7 @@ A single-screen Flutter app with these features:
 
 It uses only free services with no API key: OpenStreetMap tiles via `flutter_map`, and OSRM for routing.
 
-Design rationale is in **[DECISIONS.md](DECISIONS.md)**. The layer and folder guide is in **[documents/ARCHITECTURE.md](documents/ARCHITECTURE.md)**.
+Design rationale (architecture, native bridge, interpolation, flavors, production notes) is in **[DECISIONS.md](DECISIONS.md)**.
 
 ---
 
