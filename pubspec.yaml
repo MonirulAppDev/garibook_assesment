@@ -75,6 +75,9 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  # Used when no --flavor is given (plain `flutter run` or the IDE Run button).
+  default-flavor: dev
+
   assets:
     - assets/config/
 

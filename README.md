@@ -43,7 +43,8 @@ The two flavors have different application IDs, so both can be installed on the 
 ```bash
 flutter pub get
 
-# run
+# run (plain `flutter run` or the IDE Run button uses dev: `default-flavor` in pubspec.yaml)
+flutter run
 flutter run --flavor dev
 flutter run --flavor prod
 
