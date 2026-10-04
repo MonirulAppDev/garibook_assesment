@@ -15,11 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RoutingState {
 
-/// Start point chosen by long-press when no device location is usable.
- GeoPoint? get manualOrigin; GeoPoint? get deviceLocation; GeoPoint? get destination; RouteStatus get status;/// The current request is taking longer than expected.
- bool get isSlow;/// Last successful route. Kept on failure so an ongoing navigation
-/// isn't torn down by a failed re-route.
- NavRoute? get route; RoutingFailure? get failure;
+ GeoPoint? get manualOrigin; GeoPoint? get deviceLocation; GeoPoint? get destination; RouteStatus get status; bool get isSlow; NavRoute? get route; RoutingFailure? get failure;
 /// Create a copy of RoutingState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -273,15 +269,11 @@ class _RoutingState extends RoutingState {
   const _RoutingState({this.manualOrigin, this.deviceLocation, this.destination, this.status = RouteStatus.idle, this.isSlow = false, this.route, this.failure}): super._();
   
 
-/// Start point chosen by long-press when no device location is usable.
 @override final  GeoPoint? manualOrigin;
 @override final  GeoPoint? deviceLocation;
 @override final  GeoPoint? destination;
 @override@JsonKey() final  RouteStatus status;
-/// The current request is taking longer than expected.
 @override@JsonKey() final  bool isSlow;
-/// Last successful route. Kept on failure so an ongoing navigation
-/// isn't torn down by a failed re-route.
 @override final  NavRoute? route;
 @override final  RoutingFailure? failure;
 

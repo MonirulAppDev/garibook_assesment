@@ -28,7 +28,6 @@ final class RoutingBadResponse extends RoutingFailure {
   const RoutingBadResponse([super.message = 'Unexpected routing response']);
 }
 
-/// A newer request superseded this one. Not an error for the user.
 final class RoutingCancelled extends RoutingFailure {
   const RoutingCancelled() : super('Superseded by a newer request');
 }

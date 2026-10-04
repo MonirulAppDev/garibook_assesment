@@ -7,16 +7,6 @@ import 'bearing_smoother.dart';
 import 'navigation_engine.dart';
 import 'route_geometry.dart';
 
-/// Moves the car from real GPS fixes instead of a simulation.
-///
-/// - **Snap to route:** a fix within [snapThresholdMeters] of the line is
-///   displayed on the nearest route point; farther fixes are shown raw.
-/// - **Smoothness:** between fixes (~1–2 s apart) the car glides over
-///   [glideDuration]; when both ends are on the route it glides *along the
-///   road* (by distance), so it follows curves instead of cutting corners.
-/// - **Off-route:** [offRouteConfirmations] consecutive fixes farther than
-///   [offRouteThresholdMeters] (ignoring fixes less accurate than
-///   [maxAccuracyForOffRouteMeters]) report off-route once, then re-arm.
 final class LiveRouteTracker implements NavigationEngine {
   LiveRouteTracker({
     required this.geometry,
@@ -56,7 +46,6 @@ final class LiveRouteTracker implements NavigationEngine {
   @override
   NavigationStatus get status => _status;
 
-  /// Feeds a GPS fix. Returns true when the device is confirmed off-route.
   bool onPosition(LivePosition position) {
     if (_status != NavigationStatus.playing || !position.point.isValid) {
       return false;
@@ -69,7 +58,7 @@ final class LiveRouteTracker implements NavigationEngine {
     _lastRaw = position.point;
     _from = _currentDisplay();
     _to = target;
-    _t = previousRaw == null ? 1 : 0; // first fix: place immediately
+    _t = previousRaw == null ? 1 : 0;
 
     if (target.along != null &&
         geometry.totalLength - target.along! <= arrivalThresholdMeters) {
@@ -78,7 +67,6 @@ final class LiveRouteTracker implements NavigationEngine {
     return _checkOffRoute(position, projection.offsetMeters);
   }
 
-  /// Places the car immediately at [position] (e.g. when tracking starts).
   void seed(LivePosition position) {
     final projection = geometry.project(position.point);
     if (projection == null) return;
@@ -110,13 +98,11 @@ final class LiveRouteTracker implements NavigationEngine {
       _offRouteCount++;
     }
     if (_offRouteCount >= offRouteConfirmations) {
-      _offRouteCount = 0; // re-arm: needs fresh confirmations next time
+      _offRouteCount = 0;
       return true;
     }
     return false;
   }
-
-  // region controls
 
   @override
   void start() {
@@ -157,11 +143,8 @@ final class LiveRouteTracker implements NavigationEngine {
     _smoother.snapTo(geometry.initialBearing);
   }
 
-  /// Playback speed is meaningless for real GPS.
   @override
   void setSpeed(SpeedMultiplier speed) {}
-
-  // endregion
 
   @override
   bool tick(Duration elapsed) {
@@ -220,7 +203,6 @@ final class LiveRouteTracker implements NavigationEngine {
   }
 }
 
-/// Where the car should be drawn. [along] is null when it is off the line.
 final class _Target {
   const _Target(this.point, this.along, this.bearing);
 

@@ -7,7 +7,6 @@ import '../../../../shared/theme/app_spacing.dart';
 import '../../domain/entities/navigation_status.dart';
 import '../cubit/navigation_cubit.dart';
 
-/// Live remaining distance/time, progress and playback controls.
 class NavigationPanel extends StatelessWidget {
   const NavigationPanel({
     required this.onClose,
@@ -15,10 +14,8 @@ class NavigationPanel extends StatelessWidget {
     super.key,
   });
 
-  /// Removes the route entirely (owned by the routing feature).
   final VoidCallback onClose;
 
-  /// Live GPS mode needs a working device location.
   final bool liveAvailable;
 
   @override

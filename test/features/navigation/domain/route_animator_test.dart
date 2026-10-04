@@ -26,7 +26,6 @@ void run(RouteAnimator a, int frames, [Duration dt = frame]) {
   }
 }
 
-/// Straight east-bound line from (0,0) to (0,0.01), ~1.1 km.
 List<GeoPoint> line(int segments) => [
       for (var i = 0; i <= segments; i++) p(0, 0.01 * i / segments),
     ];
@@ -142,8 +141,8 @@ void main() {
   group('BearingSmoother', () {
     test('turns the short way across north', () {
       final s = BearingSmoother(initial: 359, maxDegreesPerSecond: 1000);
-      s.step(1, 0.001); // max 1° this step
-      expect(s.value, closeTo(0, 1e-9)); // 359 → 0, not 358
+      s.step(1, 0.001);
+      expect(s.value, closeTo(0, 1e-9));
       s.step(1, 0.001);
       expect(s.value, closeTo(1, 1e-9));
     });

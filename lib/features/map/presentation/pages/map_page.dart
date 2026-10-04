@@ -22,8 +22,6 @@ import '../widgets/map_markers_layer.dart';
 import '../widgets/osm_attribution.dart';
 import '../widgets/route_polyline_layer.dart';
 
-/// The app's single screen. Composes the location, routing and navigation
-/// features; their blocs are provided above it by the router.
 class MapPage extends StatefulWidget {
   const MapPage({required this.config, super.key});
 
@@ -34,13 +32,12 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
-  static const _initialCenter = LatLng(23.8103, 90.4125); // Dhaka
+  static const _initialCenter = LatLng(23.8103, 90.4125);
   static const _initialZoom = 13.0;
   static const _userZoom = 16.0;
   static const _followZoom = 16.0;
   static const _routePadding = EdgeInsets.fromLTRB(48, 160, 48, 260);
 
-  /// Map events caused by the user's fingers (not by our controller).
   static const _userGestureSources = {
     MapEventSource.dragStart,
     MapEventSource.onDrag,
@@ -85,8 +82,6 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     }
   }
 
-  // region listeners
-
   void _onLocationChanged(BuildContext context, LocationState state) {
     context
         .read<RoutingBloc>()
@@ -113,7 +108,6 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
 
   void _onRouteChanged(BuildContext context, RoutingState state) {
     final navigation = context.read<NavigationCubit>();
-    // A live re-route must not yank the camera away from the car.
     final keepCamera = navigation.state.isLive && navigation.state.isActive;
     navigation.loadRoute(state.route);
     final route = state.route;
@@ -127,8 +121,6 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
     }
   }
 
-  /// Navigation camera: while following, keep the car centred with its
-  /// heading pointing up; return to north-up when navigation ends.
   void _onNavigationChanged(BuildContext context, NavigationState state) {
     if (!_mapReady) return;
     final frame = state.frame;
@@ -144,8 +136,6 @@ class _MapPageState extends State<MapPage> with WidgetsBindingObserver {
       -frame.bearingDegrees,
     );
   }
-
-  // endregion
 
   void _fitRoute(NavRoute route) {
     if (!_mapReady || route.points.length < 2) return;

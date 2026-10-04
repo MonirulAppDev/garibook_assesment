@@ -4,17 +4,14 @@ sealed class LocationEvent {
   const LocationEvent();
 }
 
-/// Screen opened: check permission silently (never prompts).
 final class LocationStarted extends LocationEvent {
   const LocationStarted();
 }
 
-/// User tapped "Enable location" / "Try again": may show the OS dialog.
 final class LocationEnableRequested extends LocationEvent {
   const LocationEnableRequested();
 }
 
-/// User closed the explanation / error card.
 final class LocationPromptDismissed extends LocationEvent {
   const LocationPromptDismissed();
 }

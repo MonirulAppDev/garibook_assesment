@@ -9,7 +9,6 @@ import '../models/location_exception.dart';
 import '../models/location_fix_model.dart';
 import 'location_channel_contract.dart';
 
-/// Raw access to the native location layer. Throws [LocationException].
 abstract interface class LocationPlatformDataSource {
   Future<LocationPermissionStatus> checkPermission();
   Future<LocationPermissionStatus> requestPermission();
@@ -20,7 +19,6 @@ abstract interface class LocationPlatformDataSource {
   Future<bool> openLocationSettings();
 }
 
-/// The ONLY class in the app that touches the location platform channels.
 @LazySingleton(as: LocationPlatformDataSource)
 final class MethodChannelLocationDataSource
     implements LocationPlatformDataSource {
@@ -60,8 +58,6 @@ final class MethodChannelLocationDataSource
 
   @override
   Stream<LocationFix> watchLocation(LocationRequestOptions options) {
-    // receiveBroadcastStream: native onListen on first listener, onCancel
-    // (which must stop native updates) when the last listener cancels.
     return _events
         .receiveBroadcastStream({
           LocationChannelContract.argHighAccuracy: options.highAccuracy,

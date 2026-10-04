@@ -2,8 +2,6 @@ import 'package:injectable/injectable.dart';
 
 import '../../../../core/geo/geo_point.dart';
 
-/// Decodes Google's Encoded Polyline Algorithm Format (OSRM
-/// `geometries=polyline`, precision 1e5).
 @lazySingleton
 final class PolylineDecoder {
   const PolylineDecoder();
@@ -30,7 +28,6 @@ final class PolylineDecoder {
     return points;
   }
 
-  /// Returns (value, nextIndex), or null on a truncated string.
   static (int, int)? _next(String s, int start) {
     var result = 0;
     var shift = 0;

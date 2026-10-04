@@ -8,7 +8,6 @@ import '../../../navigation/domain/entities/navigation_frame.dart';
 import '../../../navigation/presentation/cubit/navigation_cubit.dart';
 import '../../../navigation/presentation/widgets/car_marker.dart';
 
-/// Only this layer rebuilds per animation frame.
 class CarLayer extends StatelessWidget {
   const CarLayer({super.key});
 

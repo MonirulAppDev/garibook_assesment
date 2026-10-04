@@ -15,10 +15,6 @@ import '../../domain/entities/navigation_status.dart';
 part 'navigation_cubit.freezed.dart';
 part 'navigation_state.dart';
 
-/// Thin adapter between a [NavigationEngine] and the UI.
-///
-/// Frame timing comes from outside via [tick] (see `NavigationTicker`), so
-/// this cubit has no Flutter dependency and no timers of its own.
 @injectable
 class NavigationCubit extends Cubit<NavigationState> {
   NavigationCubit({
@@ -36,10 +32,6 @@ class NavigationCubit extends Cubit<NavigationState> {
   DateTime? _lastRerouteAt;
   bool _autoPaused = false;
 
-  // region route & mode
-
-  /// Loads (or clears) the route. In live mode an active session keeps
-  /// tracking on the new route, which is what a re-route needs.
   void loadRoute(NavRoute? route) {
     final continueLive = state.isLive && state.isActive;
     _route = route;
@@ -82,10 +74,6 @@ class NavigationCubit extends Cubit<NavigationState> {
     };
   }
 
-  // endregion
-
-  // region controls
-
   void start() => _control((_) => _startEngine(), following: true);
 
   void pause() => _control((e) => e.pause());
@@ -117,12 +105,6 @@ class NavigationCubit extends Cubit<NavigationState> {
     if (engine is LiveRouteTracker && last != null) engine.seed(last);
   }
 
-  // endregion
-
-  // region live GPS
-
-  /// Latest device position. Always remembered (to seed live mode); only
-  /// moves the car while a live session is playing.
   void onLivePosition(LivePosition position) {
     if (isClosed) return;
     _lastLive = position;
@@ -146,15 +128,10 @@ class NavigationCubit extends Cubit<NavigationState> {
     return last == null || _now().difference(last) >= _rerouteCooldown;
   }
 
-  // endregion
-
-  /// Called once per rendered frame while playing.
   void tick(Duration elapsed) {
     if (isClosed) return;
     if (_engine?.tick(elapsed) ?? false) _emitFrame();
   }
-
-  // region camera & lifecycle
 
   void userMovedMap() {
     if (state.following && state.isActive) {
@@ -164,21 +141,16 @@ class NavigationCubit extends Cubit<NavigationState> {
 
   void recenter() => emit(state.copyWith(following: true));
 
-  /// App went to background: pause the simulation so nothing advances
-  /// unseen. Live mode keeps its state (no fixes arrive in background).
   void appBackgrounded() {
     if (state.isPlaying && !state.isLive) {
-      pause(); // clears _autoPaused (user-control path), so set it after
+      pause();
       _autoPaused = true;
     }
   }
 
-  /// Back in foreground: continue only if *we* paused it.
   void appForegrounded() {
-    if (_autoPaused) resume(); // resume() clears the flag
+    if (_autoPaused) resume();
   }
-
-  // endregion
 
   void _control(void Function(NavigationEngine e) action, {bool? following}) {
     final engine = _engine;

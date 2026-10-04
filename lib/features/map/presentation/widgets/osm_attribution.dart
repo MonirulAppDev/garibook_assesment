@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 
-/// Visible attribution required by the OSM tile usage policy.
 class OsmAttribution extends StatelessWidget {
   const OsmAttribution({super.key});
 

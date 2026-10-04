@@ -9,13 +9,6 @@ import com.google.android.gms.location.LocationResult
 import io.flutter.plugin.common.EventChannel
 import com.garibook.navtest.location.LocationChannelContract as C
 
-/**
- * Continuous updates over an EventChannel.
- *
- * Lifecycle guarantee: native updates exist only between onListen and
- * onCancel (Dart cancelled its subscription) or [stop] (activity/engine
- * detached). Nothing keeps running in the background after that.
- */
 class LocationStreamHandler(
     private val provider: LocationProvider,
 ) : EventChannel.StreamHandler {
@@ -23,9 +16,9 @@ class LocationStreamHandler(
     private var sink: EventChannel.EventSink? = null
     private var callback: LocationCallback? = null
 
-    @SuppressLint("MissingPermission") // checked in ensureReady()
+    @SuppressLint("MissingPermission")
     override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
-        stop() // defensive: never stack two native listeners
+        stop()
         sink = events
 
         try {
@@ -51,7 +44,6 @@ class LocationStreamHandler(
             }
 
             override fun onLocationAvailability(availability: LocationAvailability) {
-                // Services switched off while streaming: report it, typed.
                 if (!availability.isLocationAvailable && !provider.isServiceEnabled()) {
                     sink?.error(C.ERR_SERVICES_DISABLED, "Location services were turned off", null)
                 }

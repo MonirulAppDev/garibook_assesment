@@ -15,11 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$NavigationState {
 
-/// Null when there is no route loaded.
- NavigationFrame? get frame; DriveMode get mode;/// Camera follows the car until the user moves the map.
- bool get following; SpeedMultiplier get speed;/// Incremented each time live mode detects the device left the route;
-/// [rerouteFrom] is where to route from.
- int get rerouteRequests; GeoPoint? get rerouteFrom;
+ NavigationFrame? get frame; DriveMode get mode; bool get following; SpeedMultiplier get speed; int get rerouteRequests; GeoPoint? get rerouteFrom;
 /// Create a copy of NavigationState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -248,14 +244,10 @@ class _NavigationState extends NavigationState {
   const _NavigationState({this.frame, this.mode = DriveMode.simulation, this.following = true, this.speed = SpeedMultiplier.x1, this.rerouteRequests = 0, this.rerouteFrom}): super._();
   
 
-/// Null when there is no route loaded.
 @override final  NavigationFrame? frame;
 @override@JsonKey() final  DriveMode mode;
-/// Camera follows the car until the user moves the map.
 @override@JsonKey() final  bool following;
 @override@JsonKey() final  SpeedMultiplier speed;
-/// Incremented each time live mode detects the device left the route;
-/// [rerouteFrom] is where to route from.
 @override@JsonKey() final  int rerouteRequests;
 @override final  GeoPoint? rerouteFrom;
 

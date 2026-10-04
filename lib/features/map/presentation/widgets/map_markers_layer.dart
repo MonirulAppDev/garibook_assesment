@@ -7,7 +7,6 @@ import '../../../../shared/extensions/geo_point_x.dart';
 import '../../../location/presentation/bloc/location_bloc.dart';
 import '../../../routing/presentation/bloc/routing_bloc.dart';
 
-/// User position, manual start point and destination markers.
 class MapMarkersLayer extends StatelessWidget {
   const MapMarkersLayer({super.key});
 

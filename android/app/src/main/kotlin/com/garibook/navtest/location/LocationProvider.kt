@@ -18,10 +18,6 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.garibook.navtest.location.LocationChannelContract as C
 
-/**
- * One-shot location via [FusedLocationProviderClient] plus shared
- * precondition checks used by the stream handler.
- */
 class LocationProvider(
     private val context: Context,
     private val permissions: PermissionManager,
@@ -37,7 +33,6 @@ class LocationProvider(
         return LocationManagerCompat.isLocationEnabled(lm)
     }
 
-    /** Throws [LocationError] if location can't be requested right now. */
     fun ensureReady() {
         if (!permissions.hasAny()) throw permissions.missingPermissionError()
         if (!isServiceEnabled()) {
@@ -53,7 +48,7 @@ class LocationProvider(
         }
     }
 
-    @SuppressLint("MissingPermission") // checked in ensureReady()
+    @SuppressLint("MissingPermission")
     fun getCurrentLocation(
         highAccuracy: Boolean,
         timeoutMs: Long,
@@ -77,7 +72,6 @@ class LocationProvider(
             callback(result)
         }
 
-        // Our own hard timeout, independent of Play Services behaviour.
         mainHandler.postAtTime(
             {
                 cts.cancel()
@@ -129,7 +123,6 @@ class LocationProvider(
         }
     }
 
-    /** Cancel any in-flight one-shot requests (engine/activity teardown). */
     fun cancelAll() {
         pendingRequests.forEach {
             it.cancel()

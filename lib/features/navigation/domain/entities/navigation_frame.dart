@@ -5,8 +5,6 @@ import 'navigation_status.dart';
 
 part 'navigation_frame.freezed.dart';
 
-/// Immutable snapshot of the simulated car, produced once per tick by the
-/// (pure Dart) route animator and rendered by the map layer.
 @freezed
 abstract class NavigationFrame with _$NavigationFrame {
   const factory NavigationFrame({

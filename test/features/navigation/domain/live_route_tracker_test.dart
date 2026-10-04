@@ -7,10 +7,8 @@ import 'package:garibook_assesment/features/navigation/domain/entities/navigatio
 
 GeoPoint p(double lat, double lng) => GeoPoint(latitude: lat, longitude: lng);
 
-// ~0.000009° latitude ≈ 1 m.
 const metre = 0.000009;
 
-/// East-bound road along the equator, ~1.1 km, densely sampled.
 final road = RouteGeometry.fromPoints([
   for (var i = 0; i <= 100; i++) p(0, 0.01 * i / 100),
 ]);
@@ -60,7 +58,7 @@ void main() {
     final t = tracker()
       ..onPosition(at(0, 0.002))
       ..onPosition(at(0, 0.004));
-    t.tick(const Duration(milliseconds: 500)); // half the glide
+    t.tick(const Duration(milliseconds: 500));
     expect(t.frame.position.longitude, closeTo(0.003, 1e-6));
     settle(t);
     expect(t.frame.position.longitude, closeTo(0.004, 1e-9));
@@ -71,7 +69,6 @@ void main() {
     const far = 80 * metre;
     expect(t.onPosition(at(far, 0.003)), isFalse);
     expect(t.onPosition(at(far, 0.0031)), isTrue);
-    // re-armed: needs two more
     expect(t.onPosition(at(far, 0.0032)), isFalse);
     expect(t.onPosition(at(far, 0.0033)), isTrue);
   });

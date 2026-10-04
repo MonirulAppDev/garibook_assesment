@@ -18,10 +18,6 @@ part 'location_bloc.freezed.dart';
 part 'location_event.dart';
 part 'location_state.dart';
 
-/// Owns the permission flow, the first fix and the live location stream.
-///
-/// Lifecycle: the native stream is subscribed only while the app is in the
-/// foreground and the bloc is alive; it is cancelled on pause and on close.
 @injectable
 class LocationBloc extends Bloc<LocationEvent, LocationState> {
   LocationBloc(
@@ -168,8 +164,6 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     await _stopStream();
   }
 
-  /// Back from background (possibly from Settings): resume streaming, or
-  /// silently re-check if the user may have fixed a permission/service issue.
   Future<void> _onResumed(
     LocationAppResumed event,
     Emitter<LocationState> emit,

@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 
-/// Identifies the app to shared public services (OSM/OSRM usage policies).
 final class UserAgentInterceptor extends Interceptor {
   UserAgentInterceptor(this.packageName);
 

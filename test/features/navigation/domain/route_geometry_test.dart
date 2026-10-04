@@ -16,7 +16,7 @@ void main() {
     final g = RouteGeometry.fromPoints([
       p(0, 0),
       p(0, 0),
-      p(0, 0.000001), // ~0.11 m
+      p(0, 0.000001),
       p(0, 0.001),
       p(0, 0.001),
       p(0, 0.002),

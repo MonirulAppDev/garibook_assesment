@@ -3,10 +3,8 @@ import 'dart:math' as math;
 import '../../../../core/geo/geo_math.dart';
 import '../../../../core/geo/geo_point.dart';
 
-/// A position on the route: where, and which way the road is heading.
 typedef RoutePosition = ({GeoPoint point, double bearing});
 
-/// Result of snapping an arbitrary point onto the route.
 typedef RouteProjection = ({
   GeoPoint point,
   double distanceAlong,
@@ -14,20 +12,9 @@ typedef RouteProjection = ({
   double bearing,
 });
 
-/// Cleaned route polyline with precomputed cumulative distances, so any
-/// position can be looked up by *distance travelled* in O(log n).
-///
-/// Moving by distance (not by point index) is what keeps the car's speed
-/// constant regardless of how dense or sparse the route points are.
 final class RouteGeometry {
   RouteGeometry._(this.points, this._cumulative, this._bearings);
 
-  /// Builds geometry from raw router output.
-  ///
-  /// Robustness: drops non-finite/invalid coordinates and any point closer
-  /// than [minSpacingMeters] to the previously kept one (duplicates and
-  /// near-duplicates). Every remaining segment therefore has a positive
-  /// length, so interpolation never divides by zero.
   factory RouteGeometry.fromPoints(
     List<GeoPoint> raw, {
     double minSpacingMeters = 0.5,
@@ -61,15 +48,12 @@ final class RouteGeometry {
 
   double get totalLength => _cumulative.isEmpty ? 0 : _cumulative.last;
 
-  /// Fewer than two distinct points: nothing to animate along.
   bool get isDegenerate => points.length < 2;
 
   GeoPoint? get start => points.isEmpty ? null : points.first;
 
   double get initialBearing => _bearings.isEmpty ? 0 : _bearings.first;
 
-  /// Position after travelling [distance] metres from the start.
-  /// Out-of-range distances are clamped to the route ends.
   RoutePosition positionAt(double distance) {
     if (points.isEmpty) {
       return (point: const GeoPoint(latitude: 0, longitude: 0), bearing: 0);
@@ -87,11 +71,6 @@ final class RouteGeometry {
     );
   }
 
-  /// Nearest point on the route to [p] (snap-to-route).
-  ///
-  /// Each segment is projected in a local equirectangular plane centred on
-  /// its start, which is accurate to centimetres at segment scale.
-  /// Returns null for an empty route.
   RouteProjection? project(GeoPoint p) {
     if (points.isEmpty || !p.isValid) return null;
     if (isDegenerate) {
@@ -108,7 +87,6 @@ final class RouteGeometry {
       final a = points[i];
       final b = points[i + 1];
       final cosLat = math.cos(a.latitude * math.pi / 180);
-      // Planar metres relative to a.
       final bx = (b.longitude - a.longitude) * cosLat * _metersPerDegree;
       final by = (b.latitude - a.latitude) * _metersPerDegree;
       final px = (p.longitude - a.longitude) * cosLat * _metersPerDegree;
@@ -132,10 +110,9 @@ final class RouteGeometry {
 
   static const _metersPerDegree = GeoMath.earthRadiusMeters * math.pi / 180;
 
-  /// Largest segment index `i` with `cumulative[i] <= d`.
   int _segmentIndexAt(double d) {
     var lo = 0;
-    var hi = _cumulative.length - 2; // last segment index
+    var hi = _cumulative.length - 2;
     while (lo < hi) {
       final mid = (lo + hi + 1) >> 1;
       if (_cumulative[mid] <= d) {

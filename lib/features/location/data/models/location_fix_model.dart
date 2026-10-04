@@ -3,7 +3,6 @@ import '../../domain/entities/location_fix.dart';
 import '../datasources/location_channel_contract.dart';
 import 'location_exception.dart';
 
-/// Decodes the platform fix map into a domain [LocationFix].
 abstract final class LocationFixModel {
   static LocationFix fromChannel(Object? raw) {
     if (raw is! Map) {

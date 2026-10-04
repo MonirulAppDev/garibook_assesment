@@ -9,14 +9,6 @@ import androidx.core.content.ContextCompat
 import io.flutter.plugin.common.PluginRegistry
 import com.garibook.navtest.location.LocationChannelContract as C
 
-/**
- * Runtime location permission handling.
- *
- * "Permanently denied" is not reported by Android directly. We infer it as:
- * not granted AND we have asked before AND the OS no longer wants a
- * rationale. The "asked before" flag avoids misreporting a fresh install
- * (where shouldShowRequestPermissionRationale is also false) as forever-denied.
- */
 class PermissionManager(private val context: Context) :
     PluginRegistry.RequestPermissionsResultListener {
 
@@ -39,7 +31,6 @@ class PermissionManager(private val context: Context) :
         else -> C.PERMISSION_DENIED
     }
 
-    /** Error to report when an operation needs permission but has none. */
     fun missingPermissionError(): LocationError =
         if (currentStatus() == C.PERMISSION_DENIED_FOREVER) {
             LocationError(C.ERR_PERMISSION_DENIED_FOREVER, "Location permission permanently denied")
@@ -88,7 +79,6 @@ class PermissionManager(private val context: Context) :
         return true
     }
 
-    /** Activity went away mid-request: never leave a Dart future hanging. */
     fun cancelPending() {
         pendingCallback?.invoke(
             Result.failure(LocationError(C.ERR_NO_ACTIVITY, "Activity detached during permission request")),
@@ -110,7 +100,7 @@ class PermissionManager(private val context: Context) :
         ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
 
     private companion object {
-        const val REQUEST_CODE = 0x4C4F // "LO"
+        const val REQUEST_CODE = 0x4C4F
         const val PREFS_NAME = "navtest_location_permission"
         const val KEY_ASKED_BEFORE = "asked_before"
     }

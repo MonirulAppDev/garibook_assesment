@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Brand palette. Only the theme layer reads these directly; widgets use
-/// `Theme.of(context).colorScheme` or [NavColors].
 abstract final class AppColors {
   static const seed = Color(0xFF1565C0);
 

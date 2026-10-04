@@ -7,8 +7,6 @@ import 'user_agent_interceptor.dart';
 
 @module
 abstract class NetworkModule {
-  /// Dio instance for the routing server. Base URL and timeouts come from
-  /// the flavor config, never from app logic.
   @Named('routingDio')
   @lazySingleton
   Dio routingDio(FlavorConfig config) {

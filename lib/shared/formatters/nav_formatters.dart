@@ -1,4 +1,3 @@
-/// Human-readable distance / duration. Defensive against NaN/Infinity.
 abstract final class NavFormatters {
   static String distance(double meters) {
     if (!meters.isFinite || meters <= 0) return '0 m';

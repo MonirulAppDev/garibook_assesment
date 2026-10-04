@@ -4,10 +4,6 @@ import 'bearing_smoother.dart';
 import 'navigation_engine.dart';
 import 'route_geometry.dart';
 
-/// Pure-Dart car simulation along a [RouteGeometry].
-///
-/// Driven externally by [tick] (a Flutter Ticker in the app, plain calls in
-/// tests), so it is fully testable without a map widget or real time.
 final class RouteAnimator implements NavigationEngine {
   RouteAnimator({
     required this.geometry,
@@ -18,21 +14,15 @@ final class RouteAnimator implements NavigationEngine {
   })  : baseSpeedMps = baseSpeedMps ?? simulationSpeedFor(geometry.totalLength),
         _smoother = BearingSmoother(initial: geometry.initialBearing);
 
-  /// Default demo speed: a whole route takes about a minute at 1x, clamped
-  /// to a believable range. Speed is constant along the route.
   static double simulationSpeedFor(double lengthMeters) =>
       lengthMeters.isFinite ? (lengthMeters / 60).clamp(15.0, 250.0) : 15.0;
 
   final RouteGeometry geometry;
 
-  /// Real-world average speed (from the router) used for the live ETA, so
-  /// remaining time reflects driving time rather than the demo speed.
   final double etaSpeedMps;
 
   final double baseSpeedMps;
 
-  /// Upper bound for one tick. Prevents teleporting after a frame hitch or
-  /// returning from background (large elapsed gaps).
   final Duration maxStep;
 
   final BearingSmoother _smoother;
@@ -46,8 +36,6 @@ final class RouteAnimator implements NavigationEngine {
   double get travelled => _travelled;
   double get remaining =>
       (geometry.totalLength - _travelled).clamp(0.0, double.infinity);
-
-  // region controls (invalid transitions are no-ops)
 
   @override
   void start() {
@@ -86,9 +74,6 @@ final class RouteAnimator implements NavigationEngine {
   @override
   void setSpeed(SpeedMultiplier speed) => _speed = speed;
 
-  // endregion
-
-  /// Advances the simulation by [elapsed]. Returns true if the frame changed.
   @override
   bool tick(Duration elapsed) {
     if (_status != NavigationStatus.playing) return false;
@@ -102,7 +87,6 @@ final class RouteAnimator implements NavigationEngine {
       _status = NavigationStatus.finished;
     }
     final target = geometry.positionAt(_travelled).bearing;
-    // Turn faster at higher playback speeds so heading keeps up with corners.
     _smoother.step(target, dt, rateScale: _speed.factor);
     return true;
   }

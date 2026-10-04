@@ -13,7 +13,6 @@ void main() {
 
   const from = GeoPoint(latitude: 23.8, longitude: 90.4);
   const to = GeoPoint(latitude: 23.9, longitude: 90.5);
-  // OSRM expects longitude,latitude.
   const path = '/route/v1/driving/90.4,23.8;90.5,23.9';
 
   setUp(() {

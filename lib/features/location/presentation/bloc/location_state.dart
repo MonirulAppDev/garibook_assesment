@@ -4,7 +4,6 @@ enum LocationStatus {
   initial,
   checking,
 
-  /// Not granted yet; show an explanation before asking.
   needsPermission,
   requesting,
   acquiring,
@@ -18,8 +17,6 @@ abstract class LocationState with _$LocationState {
     @Default(LocationStatus.initial) LocationStatus status,
     LocationPermissionStatus? permission,
 
-    /// Last known fix. Kept when a later step fails, so the UI can still
-    /// show where the user was.
     LocationFix? fix,
     LocationFailure? failure,
     @Default(false) bool promptDismissed,

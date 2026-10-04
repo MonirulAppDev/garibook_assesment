@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-/// Top-down car that rotates to face [bearingDegrees] (0 = north).
 class CarMarker extends StatelessWidget {
   const CarMarker({
     required this.bearingDegrees,
@@ -47,7 +46,6 @@ class _CarPainter extends CustomPainter {
           ..strokeWidth = 1.5,
       );
 
-    // Windshield marks the front (top = direction of travel).
     final glass = Paint()..color = Colors.white.withValues(alpha: 0.85);
     final top = body.top;
     canvas

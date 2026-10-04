@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'osrm_route_response.freezed.dart';
 part 'osrm_route_response.g.dart';
 
-/// Subset of the OSRM `/route` response we consume.
 @freezed
 abstract class OsrmRouteResponse with _$OsrmRouteResponse {
   const factory OsrmRouteResponse({

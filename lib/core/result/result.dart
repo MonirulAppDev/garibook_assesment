@@ -1,6 +1,5 @@
 import '../error/failure.dart';
 
-/// Explicit success/failure value returned by repositories and use cases.
 sealed class Result<T> {
   const Result();
 

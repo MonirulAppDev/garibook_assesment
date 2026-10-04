@@ -1,6 +1,5 @@
 import '../../../../core/error/failure.dart';
 
-/// Every way obtaining a location can fail. Exhaustive `switch` in the UI.
 sealed class LocationFailure extends Failure {
   const LocationFailure(super.message);
 }
@@ -27,8 +26,6 @@ final class LocationNotSupported extends LocationFailure {
       : super('Location is not supported on this platform');
 }
 
-/// Native layer can't serve the request right now (no Activity attached,
-/// Play Services missing, another permission request in progress, ...).
 final class LocationUnavailable extends LocationFailure {
   const LocationUnavailable(super.message);
 }

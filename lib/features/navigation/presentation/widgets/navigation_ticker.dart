@@ -4,11 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubit/navigation_cubit.dart';
 
-/// Drives [NavigationCubit.tick] from a vsync [Ticker], only while playing.
-///
-/// The ticker is owned by this widget's State and disposed with it, so no
-/// frame callback can outlive the screen. Tickers also don't fire while the
-/// app is backgrounded; the animator clamps the first delta after resume.
 class NavigationTicker extends StatefulWidget {
   const NavigationTicker({required this.child, super.key});
 
@@ -32,7 +27,7 @@ class _NavigationTickerState extends State<NavigationTicker>
 
   void _sync(bool playing) {
     if (playing && !_ticker.isActive) {
-      _last = Duration.zero; // Ticker.elapsed restarts at zero on start().
+      _last = Duration.zero;
       _ticker.start();
     } else if (!playing && _ticker.isActive) {
       _ticker.stop();

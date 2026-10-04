@@ -8,7 +8,6 @@ import '../../../../shared/extensions/geo_point_x.dart';
 import '../../../routing/domain/entities/nav_route.dart';
 import '../../../routing/presentation/bloc/routing_bloc.dart';
 
-/// Draws the current route. Rebuilds only when the route object changes.
 class RoutePolylineLayer extends StatelessWidget {
   const RoutePolylineLayer({super.key});
 

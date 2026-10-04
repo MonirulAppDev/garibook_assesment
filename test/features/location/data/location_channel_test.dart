@@ -77,7 +77,6 @@ void main() {
     }
 
     test('no native implementation -> LocationNotSupported', () async {
-      // No mock handler registered => MissingPluginException.
       final result = await repository.checkPermission();
       expect((result as Err).failure, isA<LocationNotSupported>());
     });

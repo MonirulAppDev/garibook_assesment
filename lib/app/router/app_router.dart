@@ -10,8 +10,6 @@ import '../../features/navigation/presentation/cubit/navigation_cubit.dart';
 import '../../features/routing/presentation/bloc/routing_bloc.dart';
 import 'app_routes.dart';
 
-/// Composition root for screens: resolves dependencies and hands them to
-/// pages via constructors, so pages never call the service locator.
 @lazySingleton
 final class AppRouter {
   AppRouter(this._config);

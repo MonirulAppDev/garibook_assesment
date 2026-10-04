@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 
-/** Opens system settings screens natively. */
 class SettingsLauncher(private val context: Context) {
 
     fun openAppSettings(activity: Activity?): Boolean = launch(

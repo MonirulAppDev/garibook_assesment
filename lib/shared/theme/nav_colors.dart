@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
 
-/// Map-specific semantic colors, exposed through the theme so light/dark
-/// variants switch automatically.
 @immutable
 final class NavColors extends ThemeExtension<NavColors> {
   const NavColors({

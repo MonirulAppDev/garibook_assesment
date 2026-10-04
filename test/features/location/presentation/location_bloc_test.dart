@@ -22,7 +22,6 @@ class FakeLocationRepository implements LocationRepository {
   int requestCalls = 0;
   int listenCount = 0;
   int cancelCount = 0;
-  // Closed by the bloc cancelling its subscription.
   // ignore: close_sinks
   StreamController<Result<LocationFix>>? controller;
 

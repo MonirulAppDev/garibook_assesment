@@ -174,8 +174,8 @@ void main() {
   test('re-route plans from the device position to the same destination',
       () async {
     bloc
-      ..add(RouteMapLongPressed(d1)) // manual start
-      ..add(RouteMapLongPressed(d2)); // destination
+      ..add(RouteMapLongPressed(d1))
+      ..add(RouteMapLongPressed(d2));
     await wait(30);
     repo.pending[0].complete(Ok(routeTo(d1, d2)));
     await wait(5);

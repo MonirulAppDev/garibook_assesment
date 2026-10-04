@@ -4,7 +4,6 @@ import '../../../../core/geo/geo_point.dart';
 
 part 'location_fix.freezed.dart';
 
-/// A single position reading from the device.
 @freezed
 abstract class LocationFix with _$LocationFix {
   const factory LocationFix({

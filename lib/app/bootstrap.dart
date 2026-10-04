@@ -9,7 +9,6 @@ import '../core/logging/app_logger.dart';
 import 'app.dart';
 import 'router/app_router.dart';
 
-/// Initialises bindings, DI and global error handling, then runs the app.
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 

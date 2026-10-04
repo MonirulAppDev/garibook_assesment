@@ -15,9 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LocationState {
 
- LocationStatus get status; LocationPermissionStatus? get permission;/// Last known fix. Kept when a later step fails, so the UI can still
-/// show where the user was.
- LocationFix? get fix; LocationFailure? get failure; bool get promptDismissed;
+ LocationStatus get status; LocationPermissionStatus? get permission; LocationFix? get fix; LocationFailure? get failure; bool get promptDismissed;
 /// Create a copy of LocationState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -235,8 +233,6 @@ class _LocationState extends LocationState {
 
 @override@JsonKey() final  LocationStatus status;
 @override final  LocationPermissionStatus? permission;
-/// Last known fix. Kept when a later step fails, so the UI can still
-/// show where the user was.
 @override final  LocationFix? fix;
 @override final  LocationFailure? failure;
 @override@JsonKey() final  bool promptDismissed;

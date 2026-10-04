@@ -7,12 +7,9 @@ import '../models/routing_exception.dart';
 import 'osrm_api.dart';
 
 abstract interface class RoutingRemoteDataSource {
-  /// Throws [RoutingException].
   Future<OsrmRouteDto> fetchDrivingRoute(GeoPoint from, GeoPoint to);
 }
 
-/// "Latest request wins": starting a request cancels the previous one so a
-/// slow, stale response can never overwrite a newer result.
 @LazySingleton(as: RoutingRemoteDataSource)
 final class OsrmRemoteDataSource implements RoutingRemoteDataSource {
   OsrmRemoteDataSource(this._api);
@@ -44,7 +41,6 @@ final class OsrmRemoteDataSource implements RoutingRemoteDataSource {
     } on RoutingException {
       rethrow;
     } catch (e) {
-      // JSON shape errors from the generated parser.
       throw RoutingException(RoutingErrorType.badResponse, '$e');
     } finally {
       if (identical(_inFlight, token)) _inFlight = null;
@@ -64,7 +60,6 @@ final class OsrmRemoteDataSource implements RoutingRemoteDataSource {
         _ => RoutingException(RoutingErrorType.network, e.message),
       };
 
-  /// OSRM answers "no route" with HTTP 400 and a JSON `code`.
   static RoutingException _mapBadResponse(Response<dynamic>? response) {
     final data = response?.data;
     if (data is Map && _noRouteCodes.contains(data['code'])) {

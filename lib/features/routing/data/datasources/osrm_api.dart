@@ -5,12 +5,10 @@ import '../models/osrm_route_response.dart';
 
 part 'osrm_api.g.dart';
 
-/// OSRM HTTP API. Base URL is injected from the flavor config via Dio.
 @RestApi()
 abstract class OsrmApi {
   factory OsrmApi(Dio dio) = _OsrmApi;
 
-  /// [coordinates] is `lng,lat;lng,lat` — OSRM uses longitude first.
   @GET('/route/v1/driving/{coordinates}')
   Future<OsrmRouteResponse> getRoute(
     @Path('coordinates') String coordinates, {

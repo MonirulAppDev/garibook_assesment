@@ -5,9 +5,6 @@ import '../../../../shared/widgets/status_card.dart';
 import '../../domain/failures/location_failure.dart';
 import '../bloc/location_bloc.dart';
 
-/// Explains and resolves every location state (permission, services,
-/// first fix). Renders nothing when location is fine or the card was
-/// dismissed.
 class LocationStatusPanel extends StatelessWidget {
   const LocationStatusPanel({super.key});
 

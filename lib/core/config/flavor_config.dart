@@ -5,10 +5,6 @@ import 'flavor.dart';
 part 'flavor_config.freezed.dart';
 part 'flavor_config.g.dart';
 
-/// Runtime configuration for a single build flavor.
-///
-/// Loaded from `assets/config/<flavor>.json`; changing a server URL is a
-/// config-only change, no code involved.
 @freezed
 abstract class FlavorConfig with _$FlavorConfig {
   const factory FlavorConfig({

@@ -8,13 +8,6 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import com.garibook.navtest.location.LocationChannelContract as C
 
-/**
- * Entry point of the native location layer. Registered from MainActivity.
- *
- * Owns the channels and wires them to small single-purpose collaborators:
- * [PermissionManager], [LocationProvider], [LocationStreamHandler],
- * [SettingsLauncher].
- */
 class LocationPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHandler {
 
     private var methodChannel: MethodChannel? = null
@@ -25,8 +18,6 @@ class LocationPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHan
     private var streamHandler: LocationStreamHandler? = null
     private var settings: SettingsLauncher? = null
     private var activityBinding: ActivityPluginBinding? = null
-
-    // region FlutterPlugin
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         val context = binding.applicationContext
@@ -60,10 +51,6 @@ class LocationPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHan
         settings = null
     }
 
-    // endregion
-
-    // region ActivityAware
-
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activityBinding = binding
         permissions?.let {
@@ -79,7 +66,6 @@ class LocationPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHan
 
     override fun onDetachedFromActivity() {
         detachActivity()
-        // Screen is gone for good: stop all location work.
         streamHandler?.stop()
         provider?.cancelAll()
     }
@@ -92,8 +78,6 @@ class LocationPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHan
         }
         activityBinding = null
     }
-
-    // endregion
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         val permissions = permissions

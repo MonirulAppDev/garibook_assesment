@@ -16,14 +16,6 @@ part 'routing_bloc.freezed.dart';
 part 'routing_event.dart';
 part 'routing_state.dart';
 
-/// Route selection and fetching.
-///
-/// Protecting the shared OSRM demo server and the UI from races:
-/// 1. **Debounce** – rapid long-presses collapse into one request.
-/// 2. **Rate limit** – at least [minRequestInterval] between requests.
-/// 3. **Restartable** – a new fetch cancels the pending handler.
-/// 4. **Request id** – a response that isn't for the latest request is
-///    dropped (the data source also cancels the superseded HTTP call).
 @injectable
 class RoutingBloc extends Bloc<RoutingEvent, RoutingState> {
   RoutingBloc(
@@ -56,7 +48,6 @@ class RoutingBloc extends Bloc<RoutingEvent, RoutingState> {
     if (!event.point.isValid) return;
 
     if (state.origin == null) {
-      // No usable device location: first long-press picks the start.
       emit(
         state.copyWith(
           manualOrigin: event.point,
@@ -76,7 +67,6 @@ class RoutingBloc extends Bloc<RoutingEvent, RoutingState> {
     RouteDeviceLocationChanged event,
     Emitter<RoutingState> emit,
   ) {
-    // Does not re-fetch: the route is planned from where the user was.
     emit(state.copyWith(deviceLocation: event.location));
   }
 
@@ -91,7 +81,6 @@ class RoutingBloc extends Bloc<RoutingEvent, RoutingState> {
 
   void _onReroute(RouteRerouteRequested event, Emitter<RoutingState> emit) {
     if (!event.from.isValid || state.destination == null) return;
-    // Same debounce/rate-limit/stale guards as any other fetch.
     emit(state.copyWith(manualOrigin: null, deviceLocation: event.from));
     _requestFetch(emit);
   }
@@ -123,8 +112,6 @@ class RoutingBloc extends Bloc<RoutingEvent, RoutingState> {
     final id = ++_requestId;
     _slowTimer?.cancel();
 
-    // Debounce: if another fetch arrives meanwhile, restartable() cancels
-    // this handler and emit.isDone becomes true.
     await Future<void>.delayed(_debounce);
     if (emit.isDone) return;
 
@@ -147,7 +134,7 @@ class RoutingBloc extends Bloc<RoutingEvent, RoutingState> {
       RouteParams(from: origin, to: destination),
     );
     if (id == _requestId) _slowTimer?.cancel();
-    if (emit.isDone || id != _requestId) return; // stale response
+    if (emit.isDone || id != _requestId) return;
 
     switch (result) {
       case Ok(value: final route):
@@ -160,7 +147,7 @@ class RoutingBloc extends Bloc<RoutingEvent, RoutingState> {
           ),
         );
       case Err(failure: RoutingCancelled()):
-        return; // superseded; the newer request will report
+        return;
       case Err(:final failure):
         emit(
           state.copyWith(

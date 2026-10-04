@@ -5,12 +5,9 @@ import '../../../../shared/widgets/status_card.dart';
 import '../../domain/failures/routing_failure.dart';
 import '../bloc/routing_bloc.dart';
 
-/// Bottom panel: hints, loading, route summary and routing errors.
 class RoutePanel extends StatelessWidget {
   const RoutePanel({this.showStartHint = true, super.key});
 
-  /// False while the device location is still being resolved, to avoid
-  /// suggesting a manual start point prematurely.
   final bool showStartHint;
 
   @override
@@ -56,8 +53,6 @@ class RoutePanel extends StatelessWidget {
     }
 
     if (state.route != null) {
-      // Route details/controls live in the navigation panel; only offer
-      // switching from a manual start to the device location here.
       if (!(state.usesManualOrigin && state.deviceLocation != null)) {
         return null;
       }

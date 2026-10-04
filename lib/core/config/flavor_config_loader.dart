@@ -6,15 +6,9 @@ import 'package:flutter/services.dart';
 import 'flavor.dart';
 import 'flavor_config.dart';
 
-/// Resolves the active flavor and loads its JSON configuration.
 abstract final class FlavorConfigLoader {
   static const _assetDir = 'assets/config';
 
-  /// `appFlavor` is set by `flutter run --flavor <name>`.
-  ///
-  /// When no flavor is passed (e.g. `flutter test` or a plain `flutter run`)
-  /// we fall back to [Flavor.dev] in debug builds only; a release build
-  /// without a flavor is a packaging error and fails fast.
   static Flavor resolveFlavor([String? rawFlavor = appFlavor]) {
     if (rawFlavor == null) {
       if (kReleaseMode) {

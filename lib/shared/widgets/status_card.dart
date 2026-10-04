@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../extensions/context_extensions.dart';
 import '../theme/app_spacing.dart';
 
-/// Reusable floating card for loading / info / error states over the map.
 class StatusCard extends StatelessWidget {
   const StatusCard({
     required this.message,

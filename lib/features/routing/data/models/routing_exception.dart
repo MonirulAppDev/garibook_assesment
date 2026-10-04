@@ -8,7 +8,6 @@ enum RoutingErrorType {
   cancelled,
 }
 
-/// Data-layer routing error; mapped to `RoutingFailure` by the repository.
 final class RoutingException implements Exception {
   const RoutingException(this.type, [this.message]);
 
